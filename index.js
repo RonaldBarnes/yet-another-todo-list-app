@@ -30,8 +30,12 @@ let allowCrossOriginRequests = function( req, res, next) {
 	// fails CORS: (Reason: CORS header ‘Access-Control-Allow-Origin’ does not match ‘10.60.42.69’)
 	// res.header('Access-Control-Allow-Origin', '10.60.42.69');
 	res.header('Access-Control-Allow-Origin', 'http://10.60.42.5:3003');
-	res.header('Access-Control-Allow-Headers', '*');
-	res.header('Access-Control-Allow-Methods', '*');
+// ABOVE LINE STOPPED WORKING AFTER A DAY WTF?
+//	res.header('Access-Control-Allow-Origin', '*');
+//	res.header('Access-Control-Allow-Methods', '*');
+	res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,FETCH,HEAD');
+//	res.header('Access-Control-Allow-Headers', '*');
+	res.header("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 	// The following OUGHT to be client-side, I think:
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
 	// res.header('Referrer-Policy', 'no-referrer');
