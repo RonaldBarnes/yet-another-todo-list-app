@@ -1,7 +1,8 @@
 
 import React, {Component} from 'react';
 
-// import TodoList from './TodoListXXX';
+// Deprecated:
+// import TodoList from './TodoList';
 
 import TodoItem from './TodoItem';
 import TodoForm from './TodoForm';
@@ -12,7 +13,6 @@ import './TodoApp.css';
 
 // --------------------------------------------------------------------------
 const API_URL = 'http://10.60.42.5:8123/api/todos';
-// const API_URL_GET = 'todos';
 
 
 
@@ -20,39 +20,16 @@ const API_URL = 'http://10.60.42.5:8123/api/todos';
 // --------------------------------------------------------------------------
 ALL THE FOLLOWING CAN BE SCRAPPED, BECAUSE THE CHANGE MUST OCCUR ON SERVER
 IN FILE /index.js
-THIS CHANGE MAKES IT WORK:
+THIS IS THE MAIN CHANGE MAKES IT WORK:
     res.header('Access-Control-Allow-Origin', 'http://10.60.42.5:3003');
 AND, FOR "PUT" METHOD:
 		res.header('Access-Control-Allow-Methods', '*');
+ALSO:
+	res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,FETCH,HEAD');
+	res.header("Access-Control-Allow-Headers", "Content-Type,
+		Access-Control-Allow-Headers, Authorization, X-Requested-With");
 // --------------------------------------------------------------------------
-
-const myHeaders = new Headers();
-
-/* The following appends give weird result!
-myHeaders.append( "Access-Control-Allow-Origin", "*");
-myHeaders.append( "X-WTF", "WTF?");
-myHeaders.append( 'WTF-YOU-BASTARDS', "TWF YOU BASTARDS");
-
-// THIS IS WHAT WAS SENT:
-// Access-Control-Request-Headers
-//	access-control-allow-origin,wtf-you-bastards,x-wtf
-
-
-// myHeaders.append('Access-Control-Request-Headers', '*');
-// THIS GOES ON SERVER SIDE:
-// myHeaders.append( "Access-Control-Allow-Origin", "*");
-myHeaders.append( 'Referrer-Policy', 'no-referrer');
-myHeaders.append( 'Sec-Fetch-Mode', 'no-cors');
-myHeaders.append( 'Referrer-Policy', 'no-referrer');
-
-const requestOptions = {
-	method: 'GET',
-//	headers: myHeaders,
-	// mode: 'no-cors' PREVENTS SUCCESS!
-	// mode: 'no-cors',
-	};
 */
-// --------------------------------------------------------------------------
 
 
 
@@ -64,29 +41,15 @@ class TodoApp extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+//				todoList: [{name: "...waiting...", _id: 0}],
 				todoList: [{name: "...waiting...", _id: 0}],
 				inputValue: '',
 				isLoaded: false
 				};
-
+/*
+		// Did not need refs to blank input field upon submit:
 		this.textInputTextRef = React.createRef();
 		this.blankInputField = this.blankInputField.bind(this);
-
-/*
-		this.handleToggleCompleted =
-			this.handleToggleCompleted.bind(
-				this
-*/
-/*
-				,
-				this.id,
-				this.name,
-//				this.completed ? 'true' : 'false',
-				this.completed,
-				this.created_date
-*/
-/*
-			);
 */
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 		this.handleInputChange = this.handleInputChange.bind(this);
@@ -97,7 +60,9 @@ class TodoApp extends Component {
 
 
 	// --------------------------------------------------------------------------
-	// Colt put state handling in TodoForm, not TodoApp: WTF?
+	// Colt put state handling in TodoForm, not TodoApp: Why?
+	// Store every keystroke entered into Add Todo input field into state as
+	// they occur:
 	handleInputChange(e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -113,20 +78,20 @@ class TodoApp extends Component {
 
 	// --------------------------------------------------------------------------
 	// Colt does NOT use (e) on his submit
-	// ALSO: he put state handling in TodoForm, not TodoApp: WTF?
+	// ALSO: he put state handling in TodoForm, not TodoApp: Why?
+	// --------------------------------------------------------------------------
 	handleFormSubmit(e) {
 		e.preventDefault();
 
-		console.log(`handleFormSubmit() this.state.inputValue: ${this.state.inputValue}`);
+		console.log(`handleFormSubmit() this.state.inputValue:`
+			+ ` ${this.state.inputValue}`);
 
 		// Skip zero-length, empty strings:
 		if (this.state.inputValue.length > 0) {
 			// Add the item to the DB:
 			this.addTodo( this.state.inputValue);
-			}
-		document.getElementById('inputTextField').value = '';
-		// this.inputTextRef.current.value('!');
-		// this.blankInputField();
+			document.getElementById('inputTextField').value = '';
+			} // end if length > 0
 		} // end handleFormSubmit
 
 
@@ -156,13 +121,12 @@ class TodoApp extends Component {
 				}) // end .then
 			.then( () => {
 				const updatedTodoList = this.state.todoList.filter( (item) => (
-					item._id === id ? false : true ) );
+					item._id === id ? false : true
+					) ); // end filter
 				this.setState( {
 					todoList: [...updatedTodoList],
 					inputValue: ''
 					}); // end setState
-				console.log(`DELETE: JUST SET STATE, HERE IS this.state.inputValue: `
-					+ `${this.state.inputValue}`);
 				return;
 				}) // end .then
 			.catch( err => {
@@ -177,31 +141,17 @@ class TodoApp extends Component {
 
 	// --------------------------------------------------------------------------
 	handleToggleCompleted( todoItem ) {
+	// --------------------------------------------------------------------------
 //	handleToggleCompleted( id, name, completed, created_date) {
 
-console.log(`handleToggleCompleted() todoItem:`, todoItem);
+// console.log(`handleToggleCompleted() todoItem:`, todoItem);
 //		let [_id, name, completed, created_date] = [...more];
 		let {_id, completed} = todoItem;
 console.log(`handleToggleCompleted() _id: ${_id} completed: ${completed}`);
 
-		// Invert completion status of this item:
-		// Damn, it's string and JS is stupid with Bool <--> String:
-		// Boolean("false") === true!
-		// console.log(`typeof completed:`, typeof completed);
-		// completed = !Boolean(completed);
-
-		// Manually cast "false" to false, invert it inside JSON.stringify:
-		// ALL KINDS of stupid "no" becoming true FFS:
-		// completed = (completed === ('false' || false || "no")) ? false : true;
-		// NOPE: completed = completed === ("no" || "false" || false) ? false : true;
-//		completed = completed === "no" || "false" || false ? 'true' : 'false';
-		// Eff it, toggle here:
-		// completed = !completed;
 
 
-//		console.log( `handleToggleCompleted() more/rest:`, more);
-
-//		const updatedItem = fetch( `${API_URL}/todos/${[e.target.id]}`,
+		// const updatedItem = fetch( `${API_URL}/todos/${[e.target.id]}`,
 		fetch( `${API_URL}/${_id}`,
 					{
 					method: 'PUT',
@@ -213,7 +163,7 @@ console.log(`handleToggleCompleted() _id: ${_id} completed: ${completed}`);
 //						created_date: created_date,
 						// There's a snippet of code in the todos-api that has
 						// new: true, I forget where, but for now, see what this does:
-//						new: false
+						// new: false
 						})
 					}
 				)
@@ -236,12 +186,6 @@ console.log(`handleToggleCompleted() _id: ${_id} completed: ${completed}`);
 				this.setState( { todoList: [...newList] });
 				return data;
 				})
-/*
-			.then( xyz => {
-				console.log(`xyz:`, xyz);
-				return xyz;
-				} )
-*/
 			.catch( err => {
 				console.log( `ERROR PUTting (updating) data: `, err)
 				return err;
@@ -252,6 +196,7 @@ console.log(`handleToggleCompleted() _id: ${_id} completed: ${completed}`);
 
 	// --------------------------------------------------------------------------
 	// Add new item to DB (val comes from TodoForm):
+	// --------------------------------------------------------------------------
 	addTodo(val) {
 		console.log(`addTodo(val) val: ${val}`);
 
@@ -290,15 +235,17 @@ console.log(`handleToggleCompleted() _id: ${_id} completed: ${completed}`);
 
 
 	// --------------------------------------------------------------------------
+	// Get / fetch list of all todo items from api:
+	// --------------------------------------------------------------------------
 	fetchList() {
-		const retVal = fetch(
+		fetch(
 					`${API_URL}`
 //					,
 //					requestOptions
-					)
+					) // end fetch
 
 			.then( resp => {
-				console.log( `first .then after fetch()`);
+				console.log( `fetchList() first .then after fetch()`);
 				if ( ! resp.ok ) {
 					console.log( `ERROR IN FETCH: response NOT OK: `
 						+ `${resp.status} ${resp.statusText}`);
@@ -306,57 +253,50 @@ console.log(`handleToggleCompleted() _id: ${_id} completed: ${completed}`);
 						+ `${resp.status} ${resp.statusText}`);
 					}
 				return resp;
-				})
+				}) // end .then
 			.then( resp => resp.json() )
 			.then( data => Promise.all(data) )
-//			.then( data => this.setState( {todoList: data, isLoaded: true} ))
 			.then( data => this.setState( {todoList: data, isLoaded: true} ))
 			.catch( err => {
 				console.log( `ERROR: ${err}`);
 				return [{name: err, id: 0}, {name: 'PROXY?', id: 1}];
-				})
+				}) // end catch
+		} // end fetchList
 
-console.log( `retVal: ${retVal}`);
-		return retVal;
-		}
 
+
+	// --------------------------------------------------------------------------
+	// Only runs once loaded, i.e. fetch data only at page (re-)load:
 	// --------------------------------------------------------------------------
 	componentDidMount() {
-		let x = [];
-		// x = [ {name: 'this.fetchList();', id: 1} ];
-		x = this.fetchList();
+		console.log(`componentDidMount() - calling fetchList() for todo list:`);
 
-		console.log( `fetchList() returned x=${x}`, x);
+		this.fetchList();
 		}
 
-
-
-
-	// --------------------------------------------------------------------------
-	blankInputField() {
-		this.inputTextRef.current.value('!?!');
-		}
 
 
 
 	// --------------------------------------------------------------------------
 	render() {
 		let myList;
-/*
-		// WHY?
-		if ( this.state.isLoaded ) {
-			myList = this.fetchList();
-			}
-		else
-			{
-			myList = this.state.todoList;
-			}
-*/
 		myList = this.state.todoList;
 		let addClasses = '';
 		let todoItems = '...WAIT...';
-if (this.state.isLoaded)
-	{
+
+		// Display message while waiting for data to load:
+		if (!this.state.isLoaded) {
+			return (
+				<div className='App'>
+					<h1>Todo App</h1>
+					<p>Please wait...</p>
+					<p>Fetching list of todo items</p>
+				</div>
+				); // end return
+			} // end if not isLoaded
+
+
+
 		todoItems = myList.map( item => {
 			// Add class containing text-decoration: line-through if completed:
 			addClasses = item.completed ? 'completed' : '';
@@ -365,20 +305,11 @@ if (this.state.isLoaded)
 			// Warning: Received `true` for a non-boolean attribute `completed`.
 			// If you want to write it to the DOM, pass a string instead:
 			// completed="true" or completed={value.toString()}.
-//			const completedState = item.completed.toString();
-/*
-			const completedState = "completed='"
-				+ (item.completed === false) ? "false" : "true"
-				+ "'";
-*/
-//			const completedState = item.completed ? 'true' : 'false';
-//			const completedState = item.completed ? 'yes' : 'no';
-//			const completedState = item.completed ? 1 : 0;
-/*
-console.log(`completedState: ${item.name} ${completedState}`
-	+ ` ORIG value: ${item.completed}`, typeof item.completed);
-*/
-			return <TodoItem
+			//
+			// Fixed by binding param's (I think - it was a long slog debugging)
+
+
+			const todoItem = <TodoItem
 				key={item._id}
 				// Some of these attributes are placed on <li> in TodoItem:
 				// i.e. title= ONLY works on <li>
@@ -388,9 +319,9 @@ console.log(`completedState: ${item.name} ${completedState}`
 				// without it here, <li> has no className defined!
 				className={addClasses}
 				title={item.name}
-/*
-				id={item._id}
-*/
+				// <li><span> gets the id:
+				// id={item._id}
+
 				onClick={this.handleToggleCompleted.bind(this, item)}
 /*
 				onClick={this.handleToggleCompleted.bind(this,
@@ -404,8 +335,11 @@ console.log(`completedState: ${item.name} ${completedState}`
 				onDelete={this.deleteTodo.bind(this,item._id)}
 				{...item}
 				/>
-			}); // end map
-	} // end if isLoaded
+
+				return todoItem;
+			}); // end myList.map
+
+
 
 
 		return (
@@ -416,7 +350,6 @@ console.log(`completedState: ${item.name} ${completedState}`
 					addTodo={this.addTodo}
 					handleFormSubmit={this.handleFormSubmit}
 					handleInputChange={this.handleInputChange}
-					inputTextRef={this.inputTextRef}
 					/>
 				<ul>
 					{todoItems}
@@ -427,6 +360,3 @@ console.log(`completedState: ${item.name} ${completedState}`
 	} // end class TodoApp
 
 export default TodoApp;
-
-// 					<TodoList list={[{name: 'one', id: 1}, {name: 'two', id: 2}]} />
-
