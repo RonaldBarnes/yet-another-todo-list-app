@@ -68,6 +68,10 @@ class TodoApp extends Component {
 				inputValue: '',
 				isLoaded: false
 				};
+
+		this.textInputTextRef = React.createRef();
+		this.blankInputField = this.blankInputField.bind(this);
+
 /*
 		this.handleToggleCompleted =
 			this.handleToggleCompleted.bind(
@@ -120,6 +124,9 @@ class TodoApp extends Component {
 			// Add the item to the DB:
 			this.addTodo( this.state.inputValue);
 			}
+		document.getElementById('inputTextField').value = '';
+		// this.inputTextRef.current.value('!');
+		// this.blankInputField();
 		} // end handleFormSubmit
 
 
@@ -324,6 +331,14 @@ console.log( `retVal: ${retVal}`);
 
 
 
+
+	// --------------------------------------------------------------------------
+	blankInputField() {
+		this.inputTextRef.current.value('!?!');
+		}
+
+
+
 	// --------------------------------------------------------------------------
 	render() {
 		let myList;
@@ -372,8 +387,8 @@ console.log(`completedState: ${item.name} ${completedState}`
 				// DUH, because having it HERE passes it as a "props" to <li>,
 				// without it here, <li> has no className defined!
 				className={addClasses}
-/*
 				title={item.name}
+/*
 				id={item._id}
 */
 				onClick={this.handleToggleCompleted.bind(this, item)}
@@ -401,6 +416,7 @@ console.log(`completedState: ${item.name} ${completedState}`
 					addTodo={this.addTodo}
 					handleFormSubmit={this.handleFormSubmit}
 					handleInputChange={this.handleInputChange}
+					inputTextRef={this.inputTextRef}
 					/>
 				<ul>
 					{todoItems}

@@ -24,6 +24,7 @@ class TodoForm extends Component {
 console.log(`TodoForm(): this.handleFormSubmit:`, typeof this.handleFormSubmit);
 		this.addTodo = props.addTodo;
 		// this.inputValueText = props.inputValueText;
+		this.inputTextRef=props.inputTextRef;
 		} // end constructor
 
 
@@ -62,7 +63,12 @@ console.log(`TodoForm(): this.handleFormSubmit:`, typeof this.handleFormSubmit);
 		return (
 			<div>
 				<form
-					onSubmit={this.handleFormSubmit
+					onSubmit={ () => {
+						this.handleFormSubmit();
+						this.inputTextField.value('');
+						return true;
+						}
+//, this.inputTextRef.current.value('?D?D?')
 //, () => ( this.setState( {inputValue: '!_!'}))
 //,							() => ( console.log('TodoForm() formSubmit callback') )
 						}
@@ -72,11 +78,12 @@ console.log(`TodoForm(): this.handleFormSubmit:`, typeof this.handleFormSubmit);
 						type="text"
 //						value={this.inputValueText}
 						placeholder="Enter new Todo item"
-						onChange={this.handleInputChange
-							}
+						onChange={this.handleInputChange}
+						id='inputTextField'
+						ref={this.inputTextRef}
 						/>
 					<button onClick={this.handleFormSubmit
-,							() => (this.setState( {inputValue: '__!!__'}) )
+//,							() => (this.setState( {inputValue: '__!!__'}) )
 //,							() => ( console.log('TodoForm() buttonClick callback') )
 						}>Add Todo</button>
 				</form>
