@@ -91,6 +91,7 @@ class TodoApp extends Component {
 			// Add the item to the DB:
 			this.addTodo( this.state.inputValue);
 			document.getElementById('inputTextField').value = '';
+			document.getElementById('inputTextField').focus();
 			} // end if length > 0
 		} // end handleFormSubmit
 
