@@ -3,11 +3,12 @@ import React, {Component} from 'react';
 
 // Deprecated:
 // import TodoList from './TodoList';
-
+import Header from './Header';
 import TodoItem from './TodoItem';
 import TodoForm from './TodoForm';
 
 import * as apiFetchCalls from './apiFetchCalls.js';
+import Footer from './Footer';
 
 import './TodoApp.css';
 
@@ -257,17 +258,21 @@ class TodoApp extends Component {
 
 
 		return (
-			<div className='App'>
-				<h1>Todo App</h1>
-				<TodoForm
-					inputValueText={this.state.inputValue}
-					addTodo={this.addTodo}
-					handleFormSubmit={this.handleFormSubmit}
-					handleInputChange={this.handleInputChange}
-					/>
-				<ul>
-					{todoItems}
-				</ul>
+			<div className='container'>
+				<Header />
+				<div className='App'>
+					<h2>Todo App</h2>
+					<TodoForm
+						inputValueText={this.state.inputValue}
+						addTodo={this.addTodo}
+						handleFormSubmit={this.handleFormSubmit}
+						handleInputChange={this.handleInputChange}
+						/>
+					<ul>
+						{todoItems}
+					</ul>
+				</div>
+				<Footer />
 			</div>
 			);
 		} // end render
