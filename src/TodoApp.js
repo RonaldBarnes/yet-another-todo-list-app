@@ -7,12 +7,16 @@ import React, {Component} from 'react';
 import TodoItem from './TodoItem';
 import TodoForm from './TodoForm';
 
+import * as apiFetchCalls from './apiFetchCalls.js';
+
 import './TodoApp.css';
 
 
 
 // --------------------------------------------------------------------------
-const API_URL = 'http://10.60.42.5:8123/api/todos';
+// See ./apiFetchCalls.js
+//
+// const API_URL = 'http://10.60.42.5:8123/api/todos';
 
 
 
@@ -41,19 +45,43 @@ class TodoApp extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-//				todoList: [{name: "...waiting...", _id: 0}],
-				todoList: [{name: "...waiting...", _id: 0}],
+				todoList: [],
 				inputValue: '',
 				isLoaded: false
 				};
-/*
-		// Did not need refs to blank input field upon submit:
-		this.textInputTextRef = React.createRef();
-		this.blankInputField = this.blankInputField.bind(this);
-*/
+
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 		this.handleInputChange = this.handleInputChange.bind(this);
 		}
+
+
+
+
+
+	// --------------------------------------------------------------------------
+	// Only runs once loaded, i.e. fetch data only at page (re-)load:
+	// --------------------------------------------------------------------------
+	componentDidMount() {
+		console.log(`componentDidMount() - calling fetchList() for todo list:`);
+
+		this.fetchList();
+		}
+
+
+
+
+	// --------------------------------------------------------------------------
+	// Get / fetch list of all todo items from api:
+	// --------------------------------------------------------------------------
+	async fetchList() {
+		const allItems = await apiFetchCalls.fetchTodoItemsAll();
+
+		this.setState( {todoList: allItems, isLoaded: true});
+
+		return this.state.todoList;
+		} // end fetchList
+
+
 
 
 
@@ -100,97 +128,47 @@ class TodoApp extends Component {
 
 
 	// --------------------------------------------------------------------------
-	deleteTodo( id, e ) {
-		e.preventDefault();
-
-
-		const delURL = `${API_URL}/${id}`;
-
+	async deleteTodo( id, e ) {
 		console.log(`deleteTodo(id) id: ${id}`);
 
-		fetch( `${delURL}`,
-			{
-			method: "DELETE"
-			})
-			.then( resp => {
-				if (!resp.ok) {
-					if ( resp.status >= 400 && resp.status < 500) {
-						throw Error( `ERROR fetching data: ${resp.status} ${resp.statusText}`);
-						} // end if >= 400 && < 500
-					} // end if !resp.ok
-				return resp;
-				}) // end .then
-			.then( () => {
-				const updatedTodoList = this.state.todoList.filter( (item) => (
-					item._id === id ? false : true
-					) ); // end filter
-				this.setState( {
-					todoList: [...updatedTodoList],
-					inputValue: ''
-					}); // end setState
-				return;
-				}) // end .then
-			.catch( err => {
-				console.log(`ERROR FETCHING DATA: ${err.message}`, err)
-				return err; // "?"
-				}) // end catch
+		e.preventDefault();
 
+		const retVal = await apiFetchCalls.deleteItem( id );
+		console.log(`deleteTodo(${id}): retVal: ${retVal}`);
+
+		if ( retVal.message !== 'Deleted' ) {
+			throw new Error( `Failed to delete item ${id}`, retVal);
+			}
+
+		const newList = this.state.todoList.filter( item => (
+			item._id === id ? false : true
+			)); // end filter
+
+		this.setState( {todoList: newList} );
+
+		// Clicking on delete 'X' doesn't put focus back to input field, fix it:
+		document.getElementById('inputTextField').focus();
 		} // end deleteTodo
 
 
 
 
 	// --------------------------------------------------------------------------
-	handleToggleCompleted( todoItem ) {
+	async handleToggleCompleted( todoItem ) {
 	// --------------------------------------------------------------------------
-//	handleToggleCompleted( id, name, completed, created_date) {
 
-// console.log(`handleToggleCompleted() todoItem:`, todoItem);
-//		let [_id, name, completed, created_date] = [...more];
-		let {_id, completed} = todoItem;
-console.log(`handleToggleCompleted() _id: ${_id} completed: ${completed}`);
+		// console.log(`handleToggleCompleted() todoItem:`, todoItem);
 
+		const updatedItem = await apiFetchCalls.toggleCompleted( todoItem);
 
+		// Map over todoList, updating exiting entry with returned data:
+		const newList = this.state.todoList.map( item => (
+			item._id === todoItem._id ? updatedItem : item
+			)) // end map
+		this.setState( {todoList: newList} );
 
-		// const updatedItem = fetch( `${API_URL}/todos/${[e.target.id]}`,
-		fetch( `${API_URL}/${_id}`,
-					{
-					method: 'PUT',
-					headers: { 'Content-type': 'application/json; charset=UTF-8'},
-					body: JSON.stringify({
-						id: todoItem._id,
-//						name: name,
-						completed: !todoItem.completed,
-//						created_date: created_date,
-						// There's a snippet of code in the todos-api that has
-						// new: true, I forget where, but for now, see what this does:
-						// new: false
-						})
-					}
-				)
-			.then( resp => {
-				if (!resp.ok) {
-					if (resp.status >= 400 && resp.status < 500) {
-						throw Error( `ERROR UPDATING data: ${resp.status} ${resp.statusText}`);
-						} // end status >= 400 && < 500
-					} // end !resp.ok
-				return resp;
-				}) // end .then
-			.then( resp => resp.json() )
-			.then( data => {
-				// Remove existing todo item, add the returned "completed" one:
-				// NO! map over todoList, where current record's id matches, choose
-				// fetch-PUT return value since todos-api returns updated data:
-				const newList = this.state.todoList.map( (item) => (
-					(item._id === _id) ? data : item
-					) ); // end .filter
-				this.setState( { todoList: [...newList] });
-				return data;
-				})
-			.catch( err => {
-				console.log( `ERROR PUTting (updating) data: `, err)
-				return err;
-				})
+		// Clicking on item doesn't put focus back to input field, fix it:
+		document.getElementById('inputTextField').focus();
 		}
 
 
@@ -198,82 +176,17 @@ console.log(`handleToggleCompleted() _id: ${_id} completed: ${completed}`);
 	// --------------------------------------------------------------------------
 	// Add new item to DB (val comes from TodoForm):
 	// --------------------------------------------------------------------------
-	addTodo(val) {
+	async addTodo(val) {
 		console.log(`addTodo(val) val: ${val}`);
 
-		fetch( `${API_URL}`,
-			{
-			method: "POST",
-			headers: { 'Content-type': 'application/json; charset=UTF-8'},
-			body: JSON.stringify( {name: val} )
-			})
-			.then( resp => {
-				if (!resp.ok) {
-					if ( resp.status >= 400 && resp.status < 500) {
-						throw Error( `ERROR fetching data: ${resp.status} ${resp.statusText}`);
-						} // end if >= 400 && < 500
-					} // end if !resp.ok
-				return resp;
-				}) // end .then
-			.then( resp => resp.json() )
-			.then( data => {
-				this.setState( {
-					todoList: [...this.state.todoList, data],
-					inputValue: ''
-					}); // end setState
-				console.log(`addTodo() JUST SET STATE, HERE IS this.state.inputValue: `
-					+ `${this.state.inputValue}`);
-					return data;
-				}) // end .then
-			.catch( err => {
-				console.log(`ERROR FETCHING DATA: ${err.message}`, err)
-				return err; // "?"
-				}) // end catch
-		return true;
+		const newItem = await apiFetchCalls.addItem( val );
+
+		this.setState( {todoList: [...this.state.todoList, newItem]} );
 		} // end addTodo
 
 
 
 
-	// --------------------------------------------------------------------------
-	// Get / fetch list of all todo items from api:
-	// --------------------------------------------------------------------------
-	fetchList() {
-		fetch(
-					`${API_URL}`
-//					,
-//					requestOptions
-					) // end fetch
-
-			.then( resp => {
-				console.log( `fetchList() first .then after fetch()`);
-				if ( ! resp.ok ) {
-					console.log( `ERROR IN FETCH: response NOT OK: `
-						+ `${resp.status} ${resp.statusText}`);
-					throw Error( `ERROR IN FETCH: response NOT OK: `
-						+ `${resp.status} ${resp.statusText}`);
-					}
-				return resp;
-				}) // end .then
-			.then( resp => resp.json() )
-			.then( data => Promise.all(data) )
-			.then( data => this.setState( {todoList: data, isLoaded: true} ))
-			.catch( err => {
-				console.log( `ERROR: ${err}`);
-				return [{name: err, id: 0}, {name: 'PROXY?', id: 1}];
-				}) // end catch
-		} // end fetchList
-
-
-
-	// --------------------------------------------------------------------------
-	// Only runs once loaded, i.e. fetch data only at page (re-)load:
-	// --------------------------------------------------------------------------
-	componentDidMount() {
-		console.log(`componentDidMount() - calling fetchList() for todo list:`);
-
-		this.fetchList();
-		}
 
 
 
