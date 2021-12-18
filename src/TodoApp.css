@@ -40,9 +40,17 @@ input {
 button {
 	flex-grow: 1;
 	}
-
+.App ul {
+	margin: 1rem 0 0 -25px;
+	}
 .App ul li:nth-of-type(odd) {
 	background: hsl( 99, 90%, 90%);
+	}
+.App ul li:hover {
+	background: hsl( 99, 90%, 80%);
+	}
+.App ul li:hover, .App ul li:focus {
+	outline: 1px solid blue;
 	}
 .completed {
 	text-decoration-line: line-through;
