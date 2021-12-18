@@ -1,8 +1,10 @@
 
 import './Footer.css';
 
-const Footer = () =>
-	{
+// TWO valid ways of declaring functional components:
+// const Footer = () =>
+//	{
+function Footer() {
 	return (
 		<footer className='footer'>
 			<div>
