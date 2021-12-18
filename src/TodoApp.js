@@ -259,7 +259,7 @@ class TodoApp extends Component {
 
 		return (
 			<div className='container'>
-				<Header />
+				<Header appName='Todo&nbsp;App ReactJS'/>
 				<div className='App'>
 					<h2>Todo App</h2>
 					<TodoForm
