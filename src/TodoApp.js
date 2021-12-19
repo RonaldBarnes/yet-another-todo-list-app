@@ -65,6 +65,8 @@ class TodoApp extends Component {
 	componentDidMount() {
 		console.log(`componentDidMount() - calling fetchList() for todo list:`);
 
+		document.title = 'TodoApp ReactJS';
+
 		this.fetchList();
 		}
 
@@ -210,9 +212,12 @@ class TodoApp extends Component {
 				); // end return
 			} // end if not isLoaded
 
-
+		// Make page navigable via keyboard: input text and button go first
+		let tabIndex = 1;
 
 		todoItems = myList.map( item => {
+			tabIndex++;
+
 			// Add class containing text-decoration: line-through if completed:
 			addClasses = item.completed ? 'completed' : '';
 
@@ -249,6 +254,7 @@ class TodoApp extends Component {
 */
 				onDelete={this.deleteTodo.bind(this,item._id)}
 				{...item}
+				tabIdx={tabIndex}
 				/>
 
 				return todoItem;
