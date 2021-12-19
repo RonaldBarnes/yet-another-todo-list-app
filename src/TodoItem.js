@@ -4,16 +4,19 @@ import React from 'react';
 
 
 // const TodoItem = (props) => (
-const TodoItem = ({_id, name, completed, onClick, onDelete, className}) => (
+// const TodoItem = ({_id, name, completed, onClick, onDelete, className}) => (
+const TodoItem = (props) => {
+	const {_id, name, onClick, onDelete, className} = props;
 	/*
 	constructor(props) {
 		super(props);
 		}
 	*/
 
-	<li
+	return <li
 		// Display mouse-over:
 		title={name}>
+		tabindex={props.tabIdx}
 		<span
 			// Some of these attributes are placed on TodoItem in TodoApp:
 			// BUT, they do NOT work there.
@@ -36,6 +39,6 @@ const TodoItem = ({_id, name, completed, onClick, onDelete, className}) => (
 		</li>
 //		); // end return
 //	} // end TodoItem
-	) // end TodoItem
+	} // end TodoItem
 
 export default TodoItem;
