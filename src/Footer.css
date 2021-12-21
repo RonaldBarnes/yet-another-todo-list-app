@@ -9,4 +9,28 @@
 	padding: 1rem;
 	width: 100%;
 	box-sizing: border-box;
+	border-radius: 10px;
+	position: sticky;
+	bottom: 0;
+	background: cornflowerblue;
+	opacity: 1;
 	}
+
+@media screen and (max-width: 1200px) {
+	.footer {
+		order: 200;
+    gap: 1rem;
+		flex-shrink: 0;
+
+    width: 100%;
+		font-size: 0.5rem;
+    padding: 0.25rem;
+    text-align: center;
+    margin: 0;
+		}
+	.footer div {
+		flex-shrink: 1;
+		width: 30%;
+		}
+	}
+

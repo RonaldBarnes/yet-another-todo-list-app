@@ -15,8 +15,10 @@ const TodoItem = (props) => {
 
 	return <li
 		// Display mouse-over:
-		title={name}>
-		tabindex={props.tabIdx}
+		title={name}
+		// tabindex doesn't work on <li>
+		// tabindex={props.tabIdx}
+		>
 		<span
 			// Some of these attributes are placed on TodoItem in TodoApp:
 			// BUT, they do NOT work there.

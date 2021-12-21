@@ -10,7 +10,7 @@
 	text-decoration: none;
 	color: black;
 	box-shadow: 0px 0px 5px 5px gray inset;
-	border-radius: 5px;
+	border-radius: 10px;
 	}
 
 nav {
@@ -38,7 +38,7 @@ nav ul {
 	list-style-type: none;
 	}
 nav > ul > li {
-	margin: 0 .75rem 0 .75rem;
+	margin: 0 .75rem 0 .5rem;
 	/* text-decoration not removing bullets?!? */
 	/* text-decoration: none;	*/
 	}
@@ -54,21 +54,32 @@ nav > ul > li {
 @media screen and (max-width: 1200px) {
 	.header {
 		flex-direction: column;
-		align-items: left;
+		order: 100;
+		padding-left: 1rem;
+		margin-bottom: 0rem;
+/*
+		position: sticky;
+		bottom: 2.5rem;
+*/
 		}
 	.header h1 {
 /*
 		margin: 0.75rem 0 0 2rem;
-*/
 		margin: 0.75rem 0 0 1rem;
+*/
+		text-align: left;
+		margin: 0;
 		font-size: 1.5rem;
 		}
 
+nav ul {
+	color: red;
+	}
 	.header ul {
 		flex-direction: column;
 		justify-content: left;
 		align-items: start;
-		gap: 1em;
+		gap: 1rem;
 /*
 		margin: 0.5em 0 .75em -0.5em;
 */
