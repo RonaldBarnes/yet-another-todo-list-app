@@ -1,0 +1,17 @@
+{
+  "name": "todos_api",
+  "version": "1.0.0",
+  "description": "Udemy nodejs lesson",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ronald Barnes",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "install": "^0.13.0",
+    "mongoose": "^6.0.12"
+  }
+}
