@@ -3,6 +3,9 @@ var express = require('express'),
 	bodyParser = require('body-parser')
 	;
 
+
+let PORT = 8123;
+
 // See models/index.js:
 // var mongodb = require('mongoose');
 // NOTE: mongodb uses todo-api  NOT todoS-api
@@ -55,8 +58,6 @@ app.get('/test', function(req, res){
 	});
 
 
-app.listen(8123, function(){
-	console.log( "APP IS RUNNING!");
+app.listen(PORT, function(){
+	console.log( `APP IS RUNNING on port ${PORT}!`);
 	});
-
-
