@@ -7,4 +7,5 @@ Featuring:
 * NodeJS
 * Express
 * Mongoose / MongoDB
+* jQuery
 
