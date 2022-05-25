@@ -102,4 +102,5 @@ app.get('/test', function(req, res){
 app.listen(PORT, function(){
 	console.log( `APP IS RUNNING on port ${PORT}!`);
 	console.log( `CORS is configured for access via http://${reactFrontEndUrl}`);
+	console.log( `Ensure mongodb is running (see ./mongod.sh)`);
 	});
