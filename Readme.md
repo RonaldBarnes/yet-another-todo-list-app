@@ -7,6 +7,7 @@ Featuring:
 * NodeJS
 * Express
 * Mongoose / MongoDB
+* jQuery
 
 Listens on port 8123.
 
